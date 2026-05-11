@@ -6,6 +6,14 @@ from telegram.ext import (
     Application, CommandHandler, MessageHandler,
     filters, CallbackQueryHandler
 )
+
+
+from flask import Flask
+from threading import Thread
+import os
+
+
+
 from config import Config
 from database import db
 from handlers import (
@@ -115,5 +123,21 @@ def main():
     logger.info("Starting bot...")
     application.run_polling(allowed_updates=["message", "callback_query"])
 
+
+
+# Flask app for Koyeb health check
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running successfully!"
+
+def run_web():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+
 if __name__ == "__main__":
+    Thread(target=run_web).start()
     main()
+
+
